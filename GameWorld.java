@@ -13,4 +13,8 @@ public class GameWorld extends World {
   public Stage getStage() {
     return stage;
   }
+  public void add(Renderable obj) {
+    addObject(obj, 0, 0);
+    obj.render();
+  }
 }

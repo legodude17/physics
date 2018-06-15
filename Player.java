@@ -7,4 +7,5 @@ class Player extends Chara {
   public Boolean key(String k) {
     return Greenfoot.isKeyDown(k);
   }
+
 }
