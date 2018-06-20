@@ -25,7 +25,6 @@ public class Box extends Chara {
   }
   public void render() {
     setLocation(x, y);
-    System.out.print("Foobar@");
     GreenfootImage image = new GreenfootImage(width, height);
     image.setColor(color);
     image.fill();
@@ -36,6 +35,10 @@ public class Box extends Chara {
   }
   public void setY(int y) {
     this.y = y;
+  }
+  public void setCoords(int x, int y) {
+    setX(x);
+    setY(y);
   }
   public void act() { }
 }

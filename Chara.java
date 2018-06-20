@@ -14,4 +14,8 @@ public class Chara extends Actor {
   public Stage getStage() {
     return getGameWorld().getStage();
   }
+  public void render() {}
+  public void setLoacation(int x, int y) {
+    super.setLocation(x, y);
+  }
 }
