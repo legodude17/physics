@@ -1,18 +1,28 @@
 import greenfoot.*;
+import java.awt.Desktop;
+import java.net.URI;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 public class GameWorld extends World {
   private int gravity = 1;
   private Stage stage;
   private Player playerTest;
+  private Player dummy;
   public GameWorld() {
     super(1000, 700, 1);
+    // make a world
     stage = new Stage(500, 600, 800, 100);
+    // make a stage
     add(stage);
-    stage.top.setColor(new Color(0,0,0,0));
-    add(stage.top);
-    playerTest = new Player(500, 500);
+    // add the stage
+    playerTest = new Player(500, 50, true);
+    // place the player into the GameWorld
     add(playerTest);
+    dummy = new Player(700, 50, false);
+    add(dummy);
     Greenfoot.start();
+    // begin the "game"
   }
   public Stage getStage() {
     return stage;
@@ -20,5 +30,11 @@ public class GameWorld extends World {
   public void add(Chara obj) {
     addObject(obj, 0, 0);
     obj.render();
+    obj.doit(this);
+  }
+  public void open(String url) {
+    try {
+      Desktop.getDesktop().browse(new URI(url));
+    } catch (URISyntaxException e) {} catch (IOException e) {}
   }
 }

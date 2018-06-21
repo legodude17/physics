@@ -8,14 +8,18 @@ public class Box extends Chara {
   private Color color;
   public Box(int x, int y, int width, int height, Color color) {
     super();
+    // box is a character
     this.width = width;
     this.height = height;
     this.x = x;
     this.y = y;
+    // set stuff
     setColor(color);
+    // also set stuff
   }
   public void setColor(Color color) {
     this.color = color;
+    // set color I mean really come on
   }
   public int getWidth() {
     return width;
@@ -40,5 +44,7 @@ public class Box extends Chara {
     setX(x);
     setY(y);
   }
-  public void act() { }
+  public void act() {
+    // stub
+  }
 }
