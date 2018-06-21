@@ -1,20 +1,22 @@
 import greenfoot.*;
+import java.util.Arrays;
 
 public class HurtBox extends Box {
+  // so uh, hurtboxes are the things that hurt hitboxes because
   private int damage;
   private int knock;
   private int life;
   private Actor parent;
   private int offsetX, offsetY;
   private Chara[] wonthit;
-  // "wonthit"
-  public HurtBox(int x, int y, int width, int height, int damage, int knock, int life, Actor parent) {
+  // "wonthit" the character that the hutbox wont hit
+  public HurtBox(int x, int y, int width, int height, int damage, int knock, int life, Chara parent) {
     super(parent.getX() + x, parent.getY() + y, width, height, Color.RED);
     this.damage = damage;
     this.knock = knock;
     this.life = life;
     this.parent = parent;
-    wonthit = new Actor[]{parent};
+    wonthit = new Chara[]{parent};
     offsetX = x;
     offsetY = y;
   }
@@ -27,8 +29,6 @@ public class HurtBox extends Box {
   public void act() {
     life--;
     setLocation(parent.getX() + offsetX, parent.getY() + offsetY);
-    System.out.println(getX());
-    System.out.println(getY());
     render();
     if (life <= 0) {
       getWorld().removeObject(this);
