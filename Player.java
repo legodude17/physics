@@ -3,6 +3,7 @@ import java.util.List;
 
 public class Player extends Chara {
   private Move[] moves;
+  private Projectile[] projs;
   private HitBox box;
   private int xleft, xright, ytop, ybottom, halfTheWidth, halfTheHeight, x, y;
   private float movX, movY;
@@ -97,6 +98,10 @@ public class Player extends Chara {
         this
       )
     };
+    projs = new Projectile[]{
+      new Projectile(30, 10, 3, 0, 10, 5, this),
+      new Projectile(30, 10, -3, 0, 10, 5, this)
+    };
     if (move) {
       color = Color.GREEN;
     } else {
@@ -125,6 +130,9 @@ public class Player extends Chara {
     for (int i = 0; i < moves.length; i++) {
       moves[i].onWorld(world);
     }
+    for (int i = 0; i < projs.length; i++) {
+      projs[i].onWorld(world);
+    }
   }
   public void render() {
     box.render();
@@ -148,6 +156,9 @@ public class Player extends Chara {
     checkHit();
     for (int i = 0; i < moves.length; i++) {
       moves[i].act();
+    }
+    for (int i = 0; i < projs.length; i++) {
+      projs[i].act();
     }
     if (isAtEdge()) {
       die();
@@ -228,6 +239,10 @@ public class Player extends Chara {
           inRecovery = true;
         } else if (dirY == 1) {
           moves[5].start();
+        } else if (dirX == 1) {
+          projs[0].fire(getX(), getY());
+        } else if (dirX == -1) {
+          projs[1].fire(getX(), getY());
         }
       } else {
         moves[5].up();
@@ -340,5 +355,8 @@ public class Player extends Chara {
   }
   public void anyPercent() {
     getWorld().showText(Integer.toString(damage) + '%', persentX, persentY);
+  }
+  public HitBox getBox() {
+    return box;
   }
 }

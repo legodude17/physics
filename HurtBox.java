@@ -12,6 +12,7 @@ public class HurtBox extends Box {
   private int maxWidth, maxHeight, origX, origY;
   private boolean vertical;
   private boolean right, top;
+  private boolean care = true;
   // "wonthit" the character that the hutbox wont hit
   public HurtBox(int x, int y, int width, int height, boolean rigt, boolean tp, boolean vert) {
     super(x, y, width, height, Color.RED);
@@ -36,8 +37,11 @@ public class HurtBox extends Box {
   public int getKnock() {
     return knock;
   }
+  public void dontCare() {
+    care = false;
+  }
   public void act() {
-    setCoords(parent.getX() + offsetX, parent.getY() + offsetY);
+    if (care) setCoords(parent.getX() + offsetX, parent.getY() + offsetY);
     if (_show) {
       render();
     } else {
