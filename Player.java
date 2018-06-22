@@ -17,6 +17,10 @@ public class Player extends Chara {
   private int persentY = 40;
   private boolean spaceDown = false;
   private int spaceCount = 0;
+  private boolean inRecovery = false;
+  private int recoveryCount = 0;
+  private boolean specialFall = false;
+  private Color color;
   public Player(int x, int y, boolean move, int num) {
     super();
     // "extends Chara"
@@ -25,6 +29,7 @@ public class Player extends Chara {
     halfTheHeight = 10;
     // the settings for the player
     box = new HitBox(x, y, halfTheWidth * 2, halfTheHeight * 2);
+    box.setColor(new Color(0, 0, 0, 0));
     this.x = orix = x;
     // set the original x and y
     this.y = oriy = y;
@@ -32,49 +37,72 @@ public class Player extends Chara {
     // the location, even though it's only used half the time
     domove = move;
     // if it is player controlled because yeah
-    render();
     moves = new Move[]{
       new Move(
         new HurtBox[]{
-          new HurtBox(halfTheWidth, 2, 50, 4, false, false)
-        },
-        10,
-        5,
-        new Frames(5, 10, 60),
-        this,
-        false
-      ),
-      new Move(
-        new HurtBox[]{
-          new HurtBox(2, -halfTheHeight, 4, 50, true, false)
-        },
-        10,
-        5,
-        new Frames(10, 10, 60),
-        this,
-        true
-      ),
-      new Move(
-        new HurtBox[]{
-          new HurtBox(2, halfTheHeight, 4, 50, true, true)
+          new HurtBox(halfTheWidth, 2, 50, 4, false, false, false)
         },
         2,
         1,
         new Frames(5, 10, 60),
-        this,
-        true
+        this
       ),
       new Move(
         new HurtBox[]{
-          new HurtBox(-halfTheWidth, 2, 50, 4, true, false)
+          new HurtBox(2, -halfTheHeight, 4, 50, true, false, true)
         },
-        10,
-        5,
+        2,
+        1,
+        new Frames(10, 10, 60),
+        this
+      ),
+      new Move(
+        new HurtBox[]{
+          new HurtBox(2, halfTheHeight, 4, 50, true, true, true)
+        },
+        2,
+        1,
         new Frames(5, 10, 60),
-        this,
-        false
+        this
+      ),
+      new Move(
+        new HurtBox[]{
+          new HurtBox(-halfTheWidth, 2, 50, 4, true, false, false)
+        },
+        2,
+        1,
+        new Frames(5, 10, 60),
+        this
+      ),
+      new Move(
+        new HurtBox[]{
+          new HurtBox(-halfTheWidth, 2, 10, 4, true, false, false),
+          new HurtBox(halfTheWidth, 2, 10, 4, false, false, false)
+        },
+        1,
+        1,
+        new Frames(2, 5, 10),
+        this
+      ),
+      new Move(
+        new HurtBox[]{
+          new HurtBox(-2, 2, 4, 20, false, false, true),
+          new HurtBox(2, 2, 20, 4, true, false, false),
+          new HurtBox(-2, -2, 4, 20, false, true, true),
+          new HurtBox(2, 2, 20, 4, false, false, false)
+        },
+        5,
+        0,
+        new Frames(1, 3, 5),
+        this
       )
     };
+    if (move) {
+      color = Color.GREEN;
+    } else {
+      color = Color.BLUE;
+    }
+    render();
   }
   public void doit(GameWorld world) {
     // basically init but joshua named it weird
@@ -100,7 +128,10 @@ public class Player extends Chara {
   }
   public void render() {
     box.render();
-    setImage(box.getImage());
+    GreenfootImage image = new GreenfootImage(halfTheWidth * 2, halfTheHeight * 2);
+    image.setColor(color);
+    image.fill();
+    setImage(image);
   }
   public Boolean key(String k) {
     return Greenfoot.isKeyDown(k);
@@ -120,6 +151,22 @@ public class Player extends Chara {
     }
     if (isAtEdge()) {
       die();
+    }
+
+    if (inRecovery) {
+      recoveryCount++;
+      if (recoveryCount >= 15) {
+        inRecovery = false;
+        recoveryCount = 0;
+        specialFall = true;
+        color = getImage().getColor().darker();
+        render();
+      }
+    }
+    if (standingOnSmth() && specialFall) {
+      specialFall = false;
+      color = getImage().getColor().brighter();
+      render();
     }
   }
   private void doMove() {
@@ -141,13 +188,14 @@ public class Player extends Chara {
       if (key("s")) {
         dirY = 1;
       }
+      if (specialFall) return;
       if (key("space")) {
         if (!spaceDown) {
           spaceDown = true;
           if (standingOnSmth()) {
-            movY = -15;
+            movY = -7;
           } else if (hasAirJump) {
-            movY = -15;
+            movY = -7;
             hasAirJump = false;
           }
         }
@@ -167,6 +215,15 @@ public class Player extends Chara {
           moves[2].start();
         } else if (dirY == -1) {
           moves[1].start();
+        } else {
+          moves[4].start();
+        }
+      }
+      if (key("i")) {
+        if (dirY == -1) {
+          inRecovery = true;
+        } else if (dirY == 1) {
+          moves[5].start();
         }
       }
     } else {
@@ -260,7 +317,11 @@ public class Player extends Chara {
     movY -= 1 * (nock * (damage / 100)) * (isBottom ? -1 : 1);
   }
   public void doGravity() {
-    movY += 1;
+    if (inRecovery) {
+      movY -= 1;
+    } else {
+      movY += 0.5;
+    }
     // move down, even though it's + 1
   }
   public void die() {

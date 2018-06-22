@@ -21,6 +21,7 @@ public class GameWorld extends World {
     add(playerTest);
     dummy = new Player(700, 50, false, 2);
     add(dummy);
+    setPaintOrder(Stage.class, Box.class, Player.class);
     Greenfoot.start();
     // begin the "game"
   }

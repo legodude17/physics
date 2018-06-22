@@ -8,16 +8,14 @@ public class Move {
   private Frames frames;
   private MoveState state;
   private int currentFrame;
-  private boolean vertical;
-  public Move(HurtBox[] bxs, int dmage, int nock, Frames frms, Chara parnt, boolean vert) {
+  public Move(HurtBox[] bxs, int dmage, int nock, Frames frms, Chara parnt) {
     boxes = bxs;
     damage = dmage;
     knock = nock;
     frames = frms;
     parent = parnt;
-    vertical = vert;
     for (int i = 0; i < bxs.length; i++) {
-      bxs[i].setItems(damage, knock, parent, vertical);
+      bxs[i].setItems(damage, knock, parent);
     }
     state = MoveState.READY;
   }

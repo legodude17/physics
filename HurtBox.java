@@ -13,7 +13,7 @@ public class HurtBox extends Box {
   private boolean vertical;
   private boolean right, top;
   // "wonthit" the character that the hutbox wont hit
-  public HurtBox(int x, int y, int width, int height, boolean rigt, boolean tp) {
+  public HurtBox(int x, int y, int width, int height, boolean rigt, boolean tp, boolean vert) {
     super(x, y, width, height, Color.RED);
     maxWidth = width;
     maxHeight = height;
@@ -21,13 +21,13 @@ public class HurtBox extends Box {
     origY = y;
     right = rigt;
     top = tp;
+    vertical = vert;
   }
-  public void setItems(int dmage, int nock, Chara parnt, boolean vert) {
+  public void setItems(int dmage, int nock, Chara parnt) {
     damage = dmage;
     knock = nock;
     parent = parnt;
     wonthit = new Chara[]{parent};
-    vertical = vert;
     setLocation(parent.getX() + offsetX, parent.getY() + offsetY);
   }
   public int getDamage() {
