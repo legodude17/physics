@@ -218,6 +218,10 @@ public class Player extends Chara {
         } else {
           moves[4].start();
         }
+      } else {
+        for (int i = 0; i <= 4; i++) {
+          moves[i].up();
+        }
       }
       if (key("i")) {
         if (dirY == -1) {
@@ -225,6 +229,8 @@ public class Player extends Chara {
         } else if (dirY == 1) {
           moves[5].start();
         }
+      } else {
+        moves[5].up();
       }
     } else {
       if (key("up")) {

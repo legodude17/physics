@@ -37,7 +37,7 @@ public class Move {
       doFrame();
       if (currentFrame == frames.length) {
         hide();
-        state = MoveState.COOLDOWN;
+        state = MoveState.DOWN;
         currentFrame = 0;
       }
     } else if (state == MoveState.COOLDOWN) {
@@ -72,11 +72,17 @@ public class Move {
       boxes[i].hide();
     }
   }
+  public void up() {
+    if (state == MoveState.DOWN) {
+      state = MoveState.READY;
+    }
+  }
 }
 
 enum MoveState {
   READY,
   COOLDOWN,
   STARTING,
-  RUNNING
+  RUNNING,
+  DOWN
 }
