@@ -5,20 +5,30 @@ public class HurtBox extends Box {
   // so uh, hurtboxes are the things that hurt hitboxes because
   private int damage;
   private int knock;
-  private int life;
-  private Actor parent;
+  private Chara parent;
   private int offsetX, offsetY;
   private Chara[] wonthit;
+  private boolean _show = false;
+  private int maxWidth, maxHeight, origX, origY;
+  private boolean vertical;
+  private boolean right, top;
   // "wonthit" the character that the hutbox wont hit
-  public HurtBox(int x, int y, int width, int height, int damage, int knock, int life, Chara parent) {
-    super(parent.getX() + x, parent.getY() + y, width, height, Color.RED);
-    this.damage = damage;
-    this.knock = knock;
-    this.life = life;
-    this.parent = parent;
+  public HurtBox(int x, int y, int width, int height, boolean rigt, boolean tp) {
+    super(x, y, width, height, Color.RED);
+    maxWidth = width;
+    maxHeight = height;
+    origX = x;
+    origY = y;
+    right = rigt;
+    top = tp;
+  }
+  public void setItems(int dmage, int nock, Chara parnt, boolean vert) {
+    damage = dmage;
+    knock = nock;
+    parent = parnt;
     wonthit = new Chara[]{parent};
-    offsetX = x;
-    offsetY = y;
+    vertical = vert;
+    setLocation(parent.getX() + offsetX, parent.getY() + offsetY);
   }
   public int getDamage() {
     return damage;
@@ -27,15 +37,54 @@ public class HurtBox extends Box {
     return knock;
   }
   public void act() {
-    life--;
-    setLocation(parent.getX() + offsetX, parent.getY() + offsetY);
-    render();
-    if (life <= 0) {
-      getWorld().removeObject(this);
+    setCoords(parent.getX() + offsetX, parent.getY() + offsetY);
+    if (_show) {
+      render();
+    } else {
+      setImage(new GreenfootImage(1, 1));
     }
   }
-  public boolean wontHit(Actor act) {
+  public boolean wontHit(Chara act) {
     // so it won't hit the thing that spawned it
     return Arrays.asList(wonthit).contains(act);
+  }
+  public void show() {
+    _show = true;
+  }
+  public void hide() {
+    _show = false;
+    act();
+  }
+  public void setPercent(float perc) {
+    int w, h;
+    if (!vertical) {
+      w = (int) (maxWidth * perc);
+      h = maxHeight;
+    } else {
+      h = (int) (maxHeight * perc);
+      w = maxWidth;
+    }
+    if (w == 0 || h == 0) {
+      hide();
+      return;
+    }
+    show();
+    if (top) {
+      offsetY = origY + h / 2;
+    } else {
+      offsetY = origY - h / 2;
+    }
+    if (right) {
+      offsetX = origX - w / 2;
+    } else {
+      offsetX = origX + w / 2;
+    }
+    setDims(w, h);
+  }
+  public boolean isActive() {
+    return _show;
+  }
+  public Chara getParent() {
+    return parent;
   }
 }

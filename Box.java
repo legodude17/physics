@@ -47,4 +47,9 @@ public class Box extends Chara {
   public void act() {
     // stub
   }
+  public void setDims(int wdth, int hit) {
+    width = wdth;
+    height = hit;
+    render();
+  }
 }

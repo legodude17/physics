@@ -16,10 +16,10 @@ public class GameWorld extends World {
     // make a stage
     add(stage);
     // add the stage
-    playerTest = new Player(500, 50, true);
+    playerTest = new Player(500, 50, true, 1);
     // place the player into the GameWorld
     add(playerTest);
-    dummy = new Player(700, 50, false);
+    dummy = new Player(700, 50, false, 2);
     add(dummy);
     Greenfoot.start();
     // begin the "game"

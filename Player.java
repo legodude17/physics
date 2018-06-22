@@ -15,9 +15,12 @@ public class Player extends Chara {
   private int oriy = 0;
   private int persentX = 40;
   private int persentY = 40;
-  public Player(int x, int y, boolean move) {
+  private boolean spaceDown = false;
+  private int spaceCount = 0;
+  public Player(int x, int y, boolean move, int num) {
     super();
     // "extends Chara"
+    persentX = 40 * num * 2;
     halfTheWidth = 10;
     halfTheHeight = 10;
     // the settings for the player
@@ -30,6 +33,48 @@ public class Player extends Chara {
     domove = move;
     // if it is player controlled because yeah
     render();
+    moves = new Move[]{
+      new Move(
+        new HurtBox[]{
+          new HurtBox(halfTheWidth, 2, 50, 4, false, false)
+        },
+        10,
+        5,
+        new Frames(5, 10, 60),
+        this,
+        false
+      ),
+      new Move(
+        new HurtBox[]{
+          new HurtBox(2, -halfTheHeight, 4, 50, true, false)
+        },
+        10,
+        5,
+        new Frames(10, 10, 60),
+        this,
+        true
+      ),
+      new Move(
+        new HurtBox[]{
+          new HurtBox(2, halfTheHeight, 4, 50, true, true)
+        },
+        2,
+        1,
+        new Frames(5, 10, 60),
+        this,
+        true
+      ),
+      new Move(
+        new HurtBox[]{
+          new HurtBox(-halfTheWidth, 2, 50, 4, true, false)
+        },
+        10,
+        5,
+        new Frames(5, 10, 60),
+        this,
+        false
+      )
+    };
   }
   public void doit(GameWorld world) {
     // basically init but joshua named it weird
@@ -49,6 +94,9 @@ public class Player extends Chara {
     // the top of the stage
     ybottom = stage.getY() + halfHeight + halfTheHeight;
     // the bottom of the stage
+    for (int i = 0; i < moves.length; i++) {
+      moves[i].onWorld(world);
+    }
   }
   public void render() {
     box.render();
@@ -60,44 +108,80 @@ public class Player extends Chara {
   public void act() {
     anyPercent();
     physicMovement();
-    if (domove) doMove();
+    doMove();
     // System.out.println(x);
     // System.out.println(y);
     setLocation(x, y);
     box.setCoords(x, y);
     render();
     checkHit();
+    for (int i = 0; i < moves.length; i++) {
+      moves[i].act();
+    }
     if (isAtEdge()) {
       die();
     }
   }
   private void doMove() {
-    if (key("d") && movX < maxSpeed) {
-      movX += 0.3f;
-      // increse right velocity
-    }
-    if (key("a") && movX > -maxSpeed) {
-      movX -= 0.3f;
-      // decrese right velocity
-    }
-    if (key("space")) {
-      if (standingOnSmth()) {
-        movY = -15;
-      } else if (hasAirJump) {
-        movY = -15;
-        hasAirJump = false;
+    if (domove) {
+      int dirX = 0, dirY = 0;
+      if (key("d") && movX < maxSpeed) {
+        movX += 0.3f;
+        dirX = 1;
+        // increse right velocity
       }
-      // set the veritcal velocity to -10
-    }
-    if (standingOnSmth() && !hasAirJump) {
-      hasAirJump = true;
-    }
-    if (key("u")) {
-      getGameWorld().add(new HurtBox(0, -halfTheHeight - 2, 50, 4, 10, 4, 5, this));
-    }
-    if (key("j")) {
-      getGameWorld().add(new HurtBox(halfTheWidth + 25, 0, 50, 5, 10, 4, 5, this));
-      getGameWorld().add(new HurtBox(-halfTheWidth - 25, 0, 50, 5, 10, 4, 5, this));
+      if (key("a") && movX > -maxSpeed) {
+        movX -= 0.3f;
+        dirX = -1;
+        // decrese right velocity
+      }
+      if (key("w")) {
+        dirY = -1;
+      }
+      if (key("s")) {
+        dirY = 1;
+      }
+      if (key("space")) {
+        if (!spaceDown) {
+          spaceDown = true;
+          if (standingOnSmth()) {
+            movY = -15;
+          } else if (hasAirJump) {
+            movY = -15;
+            hasAirJump = false;
+          }
+        }
+        // set the veritcal velocity to -10
+      } else {
+        spaceDown = false;
+      }
+      if (standingOnSmth() && !hasAirJump) {
+        hasAirJump = true;
+      }
+      if (key("j")) {
+        if (dirX == 1) {
+          moves[0].start();
+        } else if (dirX == -1) {
+          moves[3].start();
+        } else if (dirY == 1) {
+          moves[2].start();
+        } else if (dirY == -1) {
+          moves[1].start();
+        }
+      }
+    } else {
+      if (key("up")) {
+        moves[1].start();
+      }
+      if (key("down")) {
+        moves[2].start();
+      }
+      if (key("left")) {
+        moves[3].start();
+      }
+      if (key("right")) {
+        moves[0].start();
+      }
     }
   }
   private boolean standingOnSmth() {
@@ -157,21 +241,23 @@ public class Player extends Chara {
     List<HurtBox> hurtBoxes = getIntersectingObjects(HurtBox.class);
     if (hurtBoxes.size() != 0) {
       for (int i = 0; i < hurtBoxes.size(); i++) {
-        if (!hurtBoxes.get(i).wontHit(this)) {
+        if (!hurtBoxes.get(i).wontHit(this) && hurtBoxes.get(i).isActive()) {
           _damage += hurtBoxes.get(i).getDamage();
           _knock += hurtBoxes.get(i).getKnock();
         }
       }
       applyDamage(_damage);
-      applyKnock(_knock);
+      applyKnock(_knock, hurtBoxes.get(0).getParent());
     }
   }
   private void applyDamage(int dam) {
     damage += dam;
   }
-  private void applyKnock(int nock) {
-    movX += (nock * damage) / 600;
-    movY -= (nock * damage) / 600;
+  private void applyKnock(int nock, Chara parent) {
+    boolean isRight = parent.getX() < getX();
+    boolean isBottom = parent.getY() > getY();
+    movX += (nock * (damage / 100)) * (isRight ? 1 : -1);
+    movY -= 1 * (nock * (damage / 100)) * (isBottom ? -1 : 1);
   }
   public void doGravity() {
     movY += 1;
