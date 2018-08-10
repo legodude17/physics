@@ -21,6 +21,8 @@ public class Player extends Chara {
   private boolean inRecovery = false;
   private int recoveryCount = 0;
   private boolean specialFall = false;
+  private int dogespedX = 8;
+  private int dogespedY = 8;
   private Color color;
   public Player(int x, int y, boolean move, int num) {
     super();
@@ -28,7 +30,7 @@ public class Player extends Chara {
     persentX = 40 * num * 2;
     halfTheWidth = 10;
     halfTheHeight = 10;
-    // the settings for the player
+    // the settings for the playa
     box = new HitBox(x, y, halfTheWidth * 2, halfTheHeight * 2);
     box.setColor(new Color(0, 0, 0, 0));
     this.x = orix = x;
@@ -99,8 +101,8 @@ public class Player extends Chara {
       )
     };
     projs = new Projectile[]{
-      new Projectile(30, 10, 3, 0, 10, 5, this),
-      new Projectile(30, 10, -3, 0, 10, 5, this)
+      new Projectile(30, 10, 1, 0, 10, 5, this),
+      new Projectile(30, 10, -1, 0, 10, 5, this)
     };
     if (move) {
       color = Color.GREEN;
@@ -217,6 +219,15 @@ public class Player extends Chara {
       if (standingOnSmth() && !hasAirJump) {
         hasAirJump = true;
       }
+      if (key("l")) {
+        if (standingOnSmth()) {
+          if (key("s")) {
+            waveDash(dirX);
+          }
+        } else {
+          airDoge(dirX,dirY);
+        }
+      }
       if (key("j")) {
         if (dirX == 1) {
           moves[0].start();
@@ -234,7 +245,7 @@ public class Player extends Chara {
           moves[i].up();
         }
       }
-      if (key("i")) {
+      if (key("k")) {
         if (dirY == -1) {
           inRecovery = true;
         } else if (dirY == 1) {
@@ -335,7 +346,7 @@ public class Player extends Chara {
     boolean isRight = parent.getX() < getX();
     boolean isBottom = parent.getY() > getY();
     movX += (nock * (damage / 100)) * (isRight ? 1 : -1);
-    movY -= 1 * (nock * (damage / 100)) * (isBottom ? -1 : 1);
+    movY -= 1 * (nock * (damage / 100)) * (isBottom ? 1 : -1);
   }
   public void doGravity() {
     if (inRecovery) {
@@ -358,5 +369,15 @@ public class Player extends Chara {
   }
   public HitBox getBox() {
     return box;
+  }
+  public void airDoge(int dirX, int dirY) {
+    movX=dirX*dogespedX;
+    movY=dirY*dogespedY;
+    specialFall=true;
+    color = getImage().getColor().darker();
+    render();
+  }
+  public void waveDash(int dirX){
+    movX=dirX*dogespedX;
   }
 }
